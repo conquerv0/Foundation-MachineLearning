@@ -60,13 +60,15 @@ def display_plot(train, valid, y_label, number=0):
     :return: None
     """
     plt.figure(number)
+    plt.figure(figsize=(10, 6))
     plt.clf()
     train = np.array(train)
     valid = np.array(valid)
     plt.plot(train[:, 0], train[:, 1], "b", label="Train")
-    plt.plot(valid[:, 0], valid[:, 1], "g", label="Validation")
+    plt.plot(valid[:, 0], valid[:, 1], "g", label="Validation", color='r')
     plt.xlabel("Epoch")
     plt.ylabel(y_label)
     plt.legend()
     plt.draw()
     plt.pause(0.0001)
+    plt.savefig('NeuralNet' + y_label + ' vs Epoch.png')

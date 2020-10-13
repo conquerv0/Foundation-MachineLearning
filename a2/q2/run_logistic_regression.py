@@ -39,9 +39,7 @@ def run_logistic_regression():
     # and compute test error.                                           #
     #####################################################################
     train_ce = []
-    train_rate = 0
     valid_ce = []
-    valid_rate = 0
     i_range = range(hyperparameters["num_iterations"])
 
     for _ in i_range:
@@ -80,7 +78,7 @@ def run_pen_logistic_regression():
 
     N, M = train_inputs.shape
     lambd_seq = [0, 0.001, 0.01, 0.1, 1.0]
-    rate_lamd =[]
+    stats = {}
 
     for lambd in lambd_seq:
         hyperparameters = {
@@ -93,29 +91,41 @@ def run_pen_logistic_regression():
         valid_total_ce = 0
         train_total_rate = 0
         valid_total_rate = 0
-        train_ce = []  # The set of all CE for different iterations
-        valid_ce = []
+        train_ce_set = []  # The set of all CE for different iterations
+        valid_ce_set = []
+        train_rt_set = []
+        valid_rt_set = []
 
         for _ in range(5):
             weights = np.zeros((M+1, 1))
             train_rate, valid_rate = 0, 0
+            train_ce, valid_ce = 0, 0
             for _ in i_range:
                 f, df, y = logistic_pen(weights, train_inputs, train_targets, hyperparameters)
                 weights -= df * hyperparameters["learning_rate"]  # update df
 
-                t_ce, train_rate = evaluate(train_targets, logistic_predict(weights, train_inputs))
-                train_ce.append(t_ce)
+                train_ce, train_rate = evaluate(train_targets, logistic_predict(weights, train_inputs))
+                train_ce_set.append(train_ce)
+                train_rt_set.append(train_rate)
 
-                v_ce, valid_rate = evaluate(valid_targets, logistic_predict(weights, valid_inputs))
-                valid_ce.append(v_ce)
+                valid_ce, valid_rate = evaluate(valid_targets, logistic_predict(weights, valid_inputs))
+                valid_ce_set.append(valid_ce)
+                valid_rt_set.append(valid_rate)
 
             train_total_rate += train_rate
             valid_total_rate += valid_rate
+            train_total_ce += train_ce
+            valid_total_ce += valid_ce
 
-        rate_lamd.append(train_total_rate/5)
+        stats[str(lambd)] = {}
+        stats[str(lambd)]['avg_train_acc'] = train_total_rate/5
+        stats[str(lambd)]['avg_valid_acc'] = valid_total_rate/5
+        stats[str(lambd)]['avg_train_ce'] = train_total_ce/5
+        stats[str(lambd)]['avg_valid_ce'] = valid_total_ce/5
+
         # Take the first run
-        plot_train_ce = train_ce[:hyperparameters["num_iterations"]]
-        plot_valid_ce = valid_ce[:hyperparameters["num_iterations"]]
+        plot_train_ce = train_ce_set[:hyperparameters["num_iterations"]]
+        plot_valid_ce = valid_ce_set[:hyperparameters["num_iterations"]]
 
         plt.figure(figsize=(10, 6))
         plt.plot(i_range, plot_train_ce, color='blue', label='Training Set')
@@ -126,6 +136,7 @@ def run_pen_logistic_regression():
         plt.ylabel('Cross Entropy')
         plt.savefig("Penalty" + str(lambd)+"CE_MNIST-Small.png")  # save the figure
         plt.show()
+    print(stats)
 
     #####################################################################
     #                       END OF YOUR CODE                            #
