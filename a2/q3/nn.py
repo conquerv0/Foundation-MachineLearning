@@ -74,7 +74,8 @@ def affine_backward(grad_y, x, w):
     #####################################################################
     grad_x = np.dot(grad_y, w.T)
     grad_w = x.T.dot(grad_y)
-    grad_b = grad_y
+    N = grad_y.shape[0]
+    grad_b = np.array([1 for _ in range(N)]).dot(grad_y)
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -99,7 +100,7 @@ def relu_backward(grad_y, x):
     # TODO:                                                             #
     # Complete the function to compute the gradients of relu.           #
     #####################################################################
-    grad_x = int(x.all() >= 0)
+    grad_x = (x > 0) * grad_y
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
