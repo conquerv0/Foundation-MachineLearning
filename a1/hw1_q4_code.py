@@ -19,6 +19,7 @@ def shuffle_data(data: object) -> object:
     :rtype: object
     :return:
     """
+    np.random.seed(123)
     n_x = np.random.permutation(data['X'])
     n_t = np.random.permutation(data['t'])
     n_data = {'X': n_x, 't': n_t}
@@ -84,7 +85,7 @@ def loss(data, model) -> object:
     w = model
     N = len(t)
     pred = predict(data, model)
-    avg_loss = np.linalg.norm(np.subtract(pred, t))/ (N*2)
+    avg_loss = np.square(np.linalg.norm(np.subtract(pred, t))) / (N*2)
     return avg_loss
 
 

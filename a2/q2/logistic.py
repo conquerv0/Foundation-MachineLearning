@@ -31,7 +31,7 @@ def logistic_predict(weights, data):
     return y
 
 
-def evaluate(targets, y):
+def evaluate(targets, y) -> object:
     """ Compute evaluation metrics.
 
     Note: N is the number of examples

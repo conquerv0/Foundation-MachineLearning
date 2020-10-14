@@ -10,6 +10,7 @@ def run_logistic_regression():
     train_inputs, train_targets = load_train()
     # train_inputs, train_targets = load_train_small()
     valid_inputs, valid_targets = load_valid()
+    test_inputs, test_targets = load_test()
 
     N, M = train_inputs.shape
 
@@ -40,6 +41,7 @@ def run_logistic_regression():
     #####################################################################
     train_ce = []
     valid_ce = []
+    train_rate, valid_rate, t_ce, v_ce = 0, 0, 0, 0
     i_range = range(hyperparameters["num_iterations"])
 
     for _ in i_range:
@@ -61,6 +63,9 @@ def run_logistic_regression():
     plt.ylabel('Cross Entropy')
     plt.savefig("CE_MNIST.png")  # save the figure
     plt.show()
+
+    test_ce, test_rate = evaluate(test_targets, logistic_predict(weights, test_inputs))
+    print(train_rate, t_ce, valid_rate, v_ce, test_rate, test_ce)
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -167,5 +172,5 @@ def run_check_grad(hyperparameters):
 
 
 if __name__ == "__main__":
-    run_pen_logistic_regression()
-    # run_logistic_regression()
+    # run_pen_logistic_regression()
+    run_logistic_regression()
