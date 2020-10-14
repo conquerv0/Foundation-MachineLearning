@@ -71,4 +71,5 @@ def display_plot(train, valid, y_label, number=0):
     plt.legend()
     plt.draw()
     plt.pause(0.0001)
-    plt.savefig('NeuralNet ' + y_label + ' vs Epoch.png')
+    plt.title('NeuralNet ' + y_label + ' vs Epoch with a=0.001 and other default')
+    plt.savefig('NeuralNet ' + y_label + ' vs Epoch with a=0.001 and other default.png')

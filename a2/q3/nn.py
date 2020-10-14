@@ -18,6 +18,7 @@ the lines in "main()".
 
 from q3.utils import load_data, load, save, display_plot
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def init_nn(num_inputs, num_hiddens, num_outputs):
@@ -242,6 +243,24 @@ def train(model, forward, backward, update, alpha, num_epochs, batch_size):
             # Update weights.
             update(model, alpha)
 
+            # Find confused images.
+            input_x = inputs_train[step * batch_size:(step + 1) * batch_size]
+            input_t = target_train[step * batch_size:(step + 1) * batch_size]
+
+            var = forward(model, input_x)
+            prediction = softmax(var["y"])
+
+            confused_imgs = []
+            for i in range(batch_size):
+                if np.argmax(prediction[i]) != np.argmax(input_t[i]):
+                    confused_imgs.append(i)
+
+            if confused_imgs:
+                confused_img = inputs_train[confused_imgs[0]]
+                plt.figure(figsize=(10, 10))
+                plt.imshow(confused_img.reshape(48, -1), cmap="gray")
+                plt.show()
+
         valid_ce, valid_acc = evaluate(
             inputs_valid, target_valid, model, forward, batch_size=batch_size)
         print(("Epoch {:3d} "
@@ -344,7 +363,7 @@ def main():
 
     # Hyper-parameters. Modify them if needed.
     num_hiddens = [16, 32]
-    alpha = 0.01
+    alpha = 0.001
     num_epochs = 1000
     batch_size = 100
 

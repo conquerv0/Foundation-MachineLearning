@@ -7,8 +7,8 @@ import numpy as np
 
 
 def run_logistic_regression():
-    train_inputs, train_targets = load_train()
-    # train_inputs, train_targets = load_train_small()
+    # train_inputs, train_targets = load_train()
+    train_inputs, train_targets = load_train_small()
     valid_inputs, valid_targets = load_valid()
     test_inputs, test_targets = load_test()
 
@@ -22,7 +22,7 @@ def run_logistic_regression():
     hyperparameters = {
         "learning_rate": 0.1,
         "weight_regularization": 0.,
-        "num_iterations": 1000
+        "num_iterations": 200
     }
     weights = np.zeros((M+1, 1))
     #####################################################################
@@ -77,12 +77,16 @@ def run_pen_logistic_regression():
     # Implement the function that automatically evaluates different     #
     # penalty and re-runs penalized logistic regression 5 times.        #
     #####################################################################
-    # train_inputs, train_targets = load_train()
-    train_inputs, train_targets = load_train_small()
+    train_inputs, train_targets = load_train()
+    # train_inputs, train_targets = load_train_small()
     valid_inputs, valid_targets = load_valid()
+    test_inputs, test_targets = load_test()
 
     N, M = train_inputs.shape
+    weights = np.zeros((M+1, 1))
     lambd_seq = [0, 0.001, 0.01, 0.1, 1.0]
+    # lambd_seq = [0.1] # best lambda for mnist_train
+    # lambd_seq = [0.01]  # best lambda for mnist_train_small
     stats = {}
 
     for lambd in lambd_seq:
@@ -100,6 +104,9 @@ def run_pen_logistic_regression():
         valid_ce_set = []
         train_rt_set = []
         valid_rt_set = []
+
+        test_rate = 0
+        test_ce = 0
 
         for _ in range(5):
             weights = np.zeros((M+1, 1))
@@ -141,7 +148,10 @@ def run_pen_logistic_regression():
         plt.ylabel('Cross Entropy')
         plt.savefig("Penalty" + str(lambd)+"CE_MNIST-Small.png")  # save the figure
         plt.show()
+
     print(stats)
+    # test_ce, test_rate = evaluate(test_targets, logistic_predict(weights, test_inputs))
+    # print(test_ce, test_rate)  # compute metrics after training.
 
     #####################################################################
     #                       END OF YOUR CODE                            #
