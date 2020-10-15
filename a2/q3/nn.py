@@ -209,6 +209,7 @@ def train(model, forward, backward, update, alpha, num_epochs, batch_size):
     valid_ce_list = []
     train_acc_list = []
     valid_acc_list = []
+    top_vs_actual = []
     num_train_cases = inputs_train.shape[0]
     if batch_size == -1:
         batch_size = num_train_cases
@@ -230,9 +231,9 @@ def train(model, forward, backward, update, alpha, num_epochs, batch_size):
             train_ce = -np.sum(t * np.log(prediction)) / float(x.shape[0])
             train_acc = (np.argmax(prediction, axis=1) ==
                          np.argmax(t, axis=1)).astype("float").mean()
-            print(("Epoch {:3d} Step {:2d} Train CE {:.5f} "
-                   "Train Acc {:.5f}").format(
-                epoch, step, train_ce, train_acc))
+            # print(("Epoch {:3d} Step {:2d} Train CE {:.5f} "
+            #        "Train Acc {:.5f}").format(
+            #     epoch, step, train_ce, train_acc))
 
             # Compute error.
             error = (prediction - t) / float(x.shape[0])
@@ -243,30 +244,36 @@ def train(model, forward, backward, update, alpha, num_epochs, batch_size):
             # Update weights.
             update(model, alpha)
 
-            # Find confused images.
-            input_x = inputs_train[step * batch_size:(step + 1) * batch_size]
-            input_t = target_train[step * batch_size:(step + 1) * batch_size]
-
-            var = forward(model, input_x)
-            prediction = softmax(var["y"])
-
-            confused_imgs = []
-            for i in range(batch_size):
-                if np.argmax(prediction[i]) != np.argmax(input_t[i]):
-                    confused_imgs.append(i)
-
-            if confused_imgs:
-                confused_img = inputs_train[confused_imgs[0]]
-                plt.figure(figsize=(10, 10))
-                plt.imshow(confused_img.reshape(48, -1), cmap="gray")
-                plt.show()
+            # # Find confused images.
+            # input_x = inputs_train[step * batch_size:(step + 1) * batch_size]
+            # input_t = target_train[step * batch_size:(step + 1) * batch_size]
+            #
+            # var = forward(model, input_x)
+            # prediction = softmax(var["y"])
+            #
+            # confused_imgs = []
+            # top_vs_actual = []
+            #
+            # for i in range(prediction.shape[0]):
+            #     top_class = np.argmax(prediction[i])
+            #     if np.amax(prediction[i]) <= 0.15:
+            #         confused_imgs.append(i)
+            #         top_vs_actual.append((np.amax(prediction[i]), input_t[i][top_class]))
+            #
+            # if confused_imgs:
+            #     confused_img = inputs_train[confused_imgs[-1]]
+            #     plt.figure(figsize=(10, 10))
+            #     plt.imshow(confused_img.reshape(48, -1), cmap="gray")
+            #     plt.show()
+            #     print(top_vs_actual[-1])
+            #     confused_imgs.pop()
 
         valid_ce, valid_acc = evaluate(
             inputs_valid, target_valid, model, forward, batch_size=batch_size)
-        print(("Epoch {:3d} "
-               "Validation CE {:.5f} "
-               "Validation Acc {:.5f}\n").format(
-            epoch, valid_ce, valid_acc))
+        # print(("Epoch {:3d} "
+        #        "Validation CE {:.5f} "
+        #        "Validation Acc {:.5f}\n").format(
+        #     epoch, valid_ce, valid_acc))
         train_ce_list.append((epoch, train_ce))
         train_acc_list.append((epoch, train_acc))
         valid_ce_list.append((epoch, valid_ce))
